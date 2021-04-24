@@ -31,6 +31,7 @@ io.on('connect', socket => {
       user_id = user.id;
     } else {
       user_id = userExists.id;
+
       const connection = await connectionsService.findByUserId(userExists.id);
 
       if (!connection) {
@@ -49,5 +50,12 @@ io.on('connect', socket => {
       text,
       user_id,
     });
+
+    const allMessages = await messagesService.listByUser(user_id);
+
+    socket.emit('client_list_all_messages', allMessages);
+
+    const allUsers = await connectionsService.findAllWithoutAdmin();
+    io.emit('admin_list_all_users', allUsers);
   });
 });
